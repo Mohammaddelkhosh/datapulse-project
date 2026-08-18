@@ -7,35 +7,30 @@
 ---
 
 ## ۱. هدف گزارش
-
 هدف از این مستند، پیکربندی افزونه‌ی آماری `pg_stat_statements` بر روی کانتینر PostgreSQL، ثبت سوابق اجرای کوئری‌ها، استخراج پرهزینه‌ترین کوئری‌ها بر اساس زمان اجرا و ارائه‌ی راهکارهای فنی جهت ایندکس‌گذاری و بهینه‌سازی آن‌ها می‌باشد.
 
 ---
 
 ## ۲. پیکربندی و فعال‌سازی افزونه
-
 جهت فعال‌سازی ماژول، ابتدا تنظیمات زیر در فایل `postgresql.conf` کانتینر اعمال شد:
 ```conf
 shared_preload_libraries = 'pg_stat_statements'
 pg_stat_statements.track = all
+۳. فعال‌سازی و تایید افزونه
+پس از اجرای دستور CREATE EXTENSION pg_stat_statements; در پایگاه داده مربوطه، افزونه فعال شد. برای تایید وضعیت اجرای کوئری‌ها، کوئری زیر روی ویوی pg_stat_statements اجرا گردید:
 
-
-
-## ۳. فعال‌سازی و تایید افزونه
-پس از اجرای دستور `CREATE EXTENSION pg_stat_statements;` در پایگاه داده مربوطه، افزونه فعال شد. برای تایید وضعیت اجرای کوئری‌ها، کوئری زیر روی ویوی `pg_stat_statements` اجرا گردید:
-```sql
+sql
 SELECT query, calls, total_exec_time, mean_exec_time
 FROM pg_stat_statements
 ORDER BY total_exec_time DESC
 LIMIT 5;
-
 ۴. تحلیل کوئری‌های پرهزینه (Slow Queries)
-با بررسی خروجی کوئری فوق، سه کوئری با بالاترین total_exec_time شناسایی شدند که نیاز به بهینه‌سازی دارند:
+با بررسی خروجی کوئری فوق، کوئری‌های پرهزینه با بالاترین total_exec_time شناسایی شدند که نیاز به بهینه‌سازی دارند:
 
 کوئری اول: جستجوی کامل روی لاگ‌های سیستم (Full Table Scan)
 sql
 SELECT * FROM system_logs WHERE status = 'ERROR' ORDER BY created_at DESC LIMIT 100;
-مشکل: نبود ایندکس بر روی ستون status و created_at باعث شده که دیتابیس تمام جدول را پیمایش (Seq Scan) کند.
+مشکل: نبود ایندکس بر روی ستون‌های status و created_at باعث شده که دیتابیس تمام جدول را پیمایش (Seq Scan) کند.
 راهکار: ایجاد یک ایندکس ترکیبی (Composite Index).
 کوئری دوم: محاسبات تجمیعی سنگین
 sql
