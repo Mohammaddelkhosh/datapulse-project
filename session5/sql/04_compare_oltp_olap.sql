@@ -1,31 +1,30 @@
-# Session 5 - Exercise 4: OLTP vs OLAP Comparison
+# Session 5 - Exercise 4: OLTP vs OLAP Performance Comparison
 
-## Objective
-Compare the performance of the same analytical query executed on the operational table `public.orders`
-and on the analytical star schema composed of `analytics.fact_sales` and `analytics.dim_date`.
+## هدف تمرین
 
-## Implementation
-Two equivalent monthly aggregation queries were executed:
+هدف این تمرین، مقایسه عملکرد یک کوئری تحلیلی یکسان در دو لایه متفاوت پایگاه داده است:
 
-- OLTP query on `public.orders`
-- OLAP query on `analytics.fact_sales` joined with `analytics.dim_date`
+- لایه عملیاتی یا **OLTP**: جدول `public.orders`
+- لایه تحلیلی یا **OLAP**: جدول واقعیت `analytics.fact_sales` به همراه بُعد تاریخ `analytics.dim_date`
 
-The following metrics were measured:
+کوئری مورد آزمایش، تعداد سفارش‌ها، مجموع فروش و میانگین ارزش سفارش را به تفکیک سال و ماه محاسبه می‌کند.
 
-- execution time
-- row count
-- monthly aggregation correctness
+---
 
-## Results
+## ساختار مورد بررسی
 
-- OLTP execution time: **56.492 ms**
-- OLAP execution time: **40.268 ms**
-- Performance improvement: **28.72% faster in OLAP**
+| لایه | جدول‌ها | توضیح |
+|---|---|---|
+| OLTP | `public.orders` | جدول تراکنشی و عملیاتی سفارش‌ها |
+| OLAP | `analytics.fact_sales`, `analytics.dim_date` | مدل تحلیلی Star Schema برای گزارش‌گیری |
 
-## Validation
-The monthly aggregated results of both approaches were compared using a FULL OUTER JOIN.
-All rows were validated successfully and the `validation_status` column returned `MATCH` for every month.
+در کوئری OLTP، سال و ماه مستقیماً از ستون `order_date` استخراج شدند.
+در کوئری OLAP، اطلاعات سال و ماه از جدول بُعد تاریخ `dim_date` دریافت شدند.
 
-## Conclusion
-The OLAP star schema provided better performance for analytical aggregation than querying the operational table directly.
-This confirms the benefit of separating transactional and analytical workloads.
+---
+
+## روش آزمایش
+
+برای هر لایه، کوئری تحلیلی با دستور زیر اجرا و بررسی شد:
+```sql
+EXPLAIN (ANALYZE, BUFFERS, SUMMARY, FORMAT TEXT)
