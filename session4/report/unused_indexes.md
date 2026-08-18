@@ -32,7 +32,7 @@ idx_scan ASC,
 pg_relation_size(indexrelid) DESC;
 
 
-Schema	Table Name	Index Name	Scan Count (idx_scan)	Index Size
-public	orders	idx_orders_order_date	0	16 kB
-public	orders	idx_orders_customer_id	0	16 kB
-public	orders	idx_orders_customer_date	0	16 kB
+Schema	Table Name	Index Name	               Scan Count(idx_scan)	  Index Size
+public	orders     	idx_orders_order_date	             0        	     16 kB
+public	orders    	idx_orders_customer_id   	         0      	       16 kB
+public	orders    	idx_orders_customer_date	         0	             16 kB
