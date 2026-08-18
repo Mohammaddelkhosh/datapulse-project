@@ -18,6 +18,9 @@
 ```conf
 shared_preload_libraries = 'pg_stat_statements'
 pg_stat_statements.track = all
+
+
+
 ## ۳. فعال‌سازی و تایید افزونه
 پس از اجرای دستور `CREATE EXTENSION pg_stat_statements;` در پایگاه داده مربوطه، افزونه فعال شد. برای تایید وضعیت اجرای کوئری‌ها، کوئری زیر روی ویوی `pg_stat_statements` اجرا گردید:
 ```sql
